@@ -1,9 +1,11 @@
-const express = require('express');
-const squareRouter = express.Router();
-const Square = require('square');
-const { generateStateValue } = require('../../utils/generateStateValue');
+import express from 'express'
 // const userController = require('../../controllers/userController');
 
+const squareRouter = express.Router();
+
+import Square from 'square'
+import { generateStateValue } from '../../utils/generateStateValue.js';
+import Company from '../../models/Company.model.js';
 
 // Configure Square API credentials
 const squareConfig = {
@@ -20,11 +22,23 @@ const { Client } = Square
 const squareClient = new Client(squareConfig)
 
 // GET /api/users
-squareRouter.get('/auth', (req, res) => {
+squareRouter.get('/auth', async (req, res) => {
+    const { realmId } = req.query
+    console.log('REALM ID', realmId)
     const { clientId, callbackURL } = squareConfig;
     const scope = 'PAYMENTS_READ,PAYMENTS_WRITE'; // Replace with the actual scopes your application needs
   
     const state = generateStateValue() // Optional: Include a state value for CSRF protection or other purposes
+
+    // TODO: Save state to db with realm id for use later on 
+    const existingCompany = await Company.findOne({ 'quickbooks.realmId': realmId })
+
+    console.log('EXISTING COMPANY', existingCompany)
+    existingCompany.square = {
+      state: state
+    }
+    existingCompany.save()
+
     const authUrl = `https://connect.squareupsandbox.com/oauth2/authorize?client_id=${clientId}&scope=${scope}&redirect_uri=${callbackURL}&state=${state}`;
 
     console.log('OAUTH URL', authUrl)
@@ -33,6 +47,9 @@ squareRouter.get('/auth', (req, res) => {
 
 squareRouter.get('/callback', async (req, res) => {
     const { code, state } = req.query;
+
+    console.log('CODE', code)
+    console.log('STATE', state)
   
     try {
       // Verify the state value for CSRF protection if desired
@@ -52,6 +69,16 @@ squareRouter.get('/callback', async (req, res) => {
       console.log('ACCESS TOKEN', accessToken)
       // Store the Square access token in your database or session for later use
       // TODO: Store in database
+
+      const existingCompany = await Company.findOne({ 'square.state': state })
+
+      // Update the existingCompany.square field without overwriting existing information
+      existingCompany.square = { ...existingCompany.square, ...result };
+
+      // Save the updated existingCompany
+      await existingCompany.save();
+
+      console.log('EXISTING COMPANY UPDATED', existingCompany)
   
       res.send('Square authentication successful! Token received.');
     } catch (error) {
@@ -60,5 +87,4 @@ squareRouter.get('/callback', async (req, res) => {
     }
 });
 
-module.exports = squareRouter;
-
+export default squareRouter

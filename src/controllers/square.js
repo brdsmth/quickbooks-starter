@@ -20,5 +20,5 @@ async function getSquarePayments() {
     console.log('RESPONSE', response.payments)
     return response.payments
 }
-  
+
 getSquarePayments()

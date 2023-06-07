@@ -1,77 +1,72 @@
-const express = require('express');
-const QuickBooks = require('quickbooks');
-const { apiRouter } = require('./src/api');
+import express from 'express'
+import path from 'path'
+import mongoose from 'mongoose'
+import Quickbooks from 'node-quickbooks'
+import dotenv from 'dotenv'
+import apiRouter from './src/api/index.js'
+// const path = require('path');
+// const mongoose = require('mongoose')
+// const QuickBooks = require('quickbooks');
+// require('dotenv').config()
+dotenv.config()
+
+const PORT = parseInt(process.env.PORT, 10) || 8081
+const isDev = process.env.NODE_ENV === 'dev'
+console.log('IS DEV', isDev)
+
+// MongoDB Connection
+const mongoUrl =
+  process.env.MONGO_URL || 'mongodb://127.0.0.1:27017/shopify-express-app'
+
+console.log('MONGO URL', mongoUrl)
+mongoose.connect(mongoUrl, (err) => {
+  if (err) {
+    console.error(
+      '---> An error occured while connecting to MongoDB',
+      err.message
+    )
+  } else {
+    console.log('--> Connected to MongoDB')
+    mongoose.set('strictQuery', false)
+  }
+})
+
 
 // Initialize Express app
 const app = express();
 
+// Serve the React application build files
+const __dirname = path.resolve();
+app.use(express.static(path.join(__dirname, 'client/build')));
+
+// API Routes
 app.use('/api', apiRouter)
 
-// Define endpoint for importing sales
-app.get('/import-sales', async (req, res) => {
-  try {
-    // Retrieve sales data from Square API
-    const squarePayments = await getSquarePayments();
+// // Define endpoint for importing sales
+// app.get('/import-sales', async (req, res) => {
+//   try {
+//     // Retrieve sales data from Square API
+//     const squarePayments = await getSquarePayments();
 
-    // Process and map Square payments to QuickBooks format
-    const quickbooksTransactions = mapToQuickBooksFormat(squarePayments);
+//     // Process and map Square payments to QuickBooks format
+//     const quickbooksTransactions = mapToQuickBooksFormat(squarePayments);
 
-    // Import transactions to QuickBooks
-    await importTransactionsToQuickBooks(quickbooksTransactions);
+//     // Import transactions to QuickBooks
+//     await importTransactionsToQuickBooks(quickbooksTransactions);
 
-    // Respond with success message
-    res.status(200).json({ message: 'Sales transactions imported successfully' });
-  } catch (error) {
-    // Handle errors
-    console.error('Error importing sales transactions:', error);
-    res.status(500).json({ error: 'Failed to import sales transactions' });
-  }
+//     // Respond with success message
+//     res.status(200).json({ message: 'Sales transactions imported successfully' });
+//   } catch (error) {
+//     // Handle errors
+//     console.error('Error importing sales transactions:', error);
+//     res.status(500).json({ error: 'Failed to import sales transactions' });
+//   }
+// });
+
+// For any other route, serve the React application
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'client/build/index.html'));
 });
-
-// Function to retrieve payments from Square API
-async function getSquarePayments() {
-  // Retrieve Square access token from your database or session
-  const accessToken = 'USER_SQUARE_ACCESS_TOKEN';
-
-  const paymentsApi = new SquareConnect.PaymentsApi();
-  squareClient.authentications['BearerToken'].accessToken = accessToken;
-
-  // Create a request to list all payments
-  const requestParams = {
-    locationId: 'YOUR_SQUARE_LOCATION_ID', // Specify the Square location ID
-  };
-
-  const { result } = await paymentsApi.listPayments(requestParams);
-  return result.payments;
-}
-
-// Function to map Square payments to QuickBooks format
-function mapToQuickBooksFormat(squarePayments) {
-  // Implement the logic to map Square payments to QuickBooks format
-  // Return an array of transactions in QuickBooks format
-}
-
-// Function to import transactions to QuickBooks
-async function importTransactionsToQuickBooks(quickbooksTransactions) {
-  // Retrieve QuickBooks access token and realm ID from your database or session
-  const accessToken = 'USER_QUICKBOOKS_ACCESS_TOKEN';
-  const realmId = 'USER_QUICKBOOKS_REALM_ID';
-
-  const quickbooks = new QuickBooks({
-    consumerKey: 'YOUR_QUICKBOOKS_CONSUMER_KEY',
-    consumerSecret: 'YOUR_QUICKBOOKS_CONSUMER_SECRET',
-    token: accessToken,
-    tokenSecret: '', // Not needed for OAuth2
-    refreshToken: '', // Not needed for OAuth2
-    realmId: realmId,
-    oauthVersion: '2.0', // Use OAuth2
-    refreshTokenPolicy: 'disabled', // Disable automatic token refreshing
-    minorversion: 62, // Set the desired QuickBooks API version
-    useSandbox: true, // Set to false for production
-  });
-
-  // Implement the logic to import transactions to QuickBooks using the QuickBooks API library
-}
 
 // Start the server
 app.listen(3000, () => {

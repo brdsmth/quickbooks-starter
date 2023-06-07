@@ -1,4 +1,4 @@
-function generateStateValue() {
+export const generateStateValue = () => {
     const length = 32; // Length of the state value
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     let stateValue = '';
@@ -11,6 +11,3 @@ function generateStateValue() {
     return stateValue;
 }
 
-module.exports = {
-    generateStateValue
-}

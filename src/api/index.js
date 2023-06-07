@@ -1,12 +1,10 @@
-const express = require('express');
+import express from 'express'
+import squareRouter from './routes/squareRoutes.js';
+import quickbooksRouter from './routes/quickbooksRoutes.js';
 const apiRouter = express.Router();
-const quickbooksRouter = require("./routes/quickbooksRoutes");
-const squareRouter = require("./routes/squareRoutes");
 
 
 apiRouter.use('/square', squareRouter)
 apiRouter.use('/quickbooks', quickbooksRouter)
 
-module.exports = {
-    apiRouter
-}
+export default apiRouter
