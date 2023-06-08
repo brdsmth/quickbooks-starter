@@ -40,6 +40,7 @@ const __dirname = path.resolve();
 app.use(express.static(path.join(__dirname, 'client/build')));
 
 // API Routes
+app.use(express.json())
 app.use('/api', apiRouter)
 
 // // Define endpoint for importing sales

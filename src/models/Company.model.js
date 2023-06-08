@@ -12,7 +12,11 @@ const companySchema = new mongoose.Schema({
   },
   square: {
     type: Object
-  }
+  },
+  // squarePayments: {
+  //   type: Array,
+  //   default: [],
+  // },
   // Other user fields as needed
 });
 

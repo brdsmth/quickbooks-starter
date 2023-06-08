@@ -1,26 +1,18 @@
 import React from 'react';
-import styled from 'styled-components';
-import LoginForm from './components/LoginForm';
-
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-`;
-
-const AppName = styled.div`
-  font-size: 24px;
-  margin-bottom: 20px;
-`;
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Connect from './pages/Connect';
+import Auth from './pages/Auth';
+import Transactions from './pages/Transactions';
 
 function App() {
   return (
-    <Container>
-       <AppName>SquareBooks</AppName>
-      <LoginForm />
-    </Container>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Auth />} />
+        <Route exact path="/connect" element={<Connect />} />
+        <Route exact path="/transactions" element={<Transactions />} />
+      </Routes>
+    </Router>
   );
 }
 

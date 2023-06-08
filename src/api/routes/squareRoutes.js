@@ -1,4 +1,5 @@
 import express from 'express'
+import jwt from 'jsonwebtoken'
 // const userController = require('../../controllers/userController');
 
 const squareRouter = express.Router();
@@ -6,6 +7,7 @@ const squareRouter = express.Router();
 import Square from 'square'
 import { generateStateValue } from '../../utils/generateStateValue.js';
 import Company from '../../models/Company.model.js';
+import { getSquarePayments } from '../../controllers/square.js';
 
 // Configure Square API credentials
 const squareConfig = {
@@ -80,11 +82,50 @@ squareRouter.get('/callback', async (req, res) => {
 
       console.log('EXISTING COMPANY UPDATED', existingCompany)
   
-      res.send('Square authentication successful! Token received.');
+      // res.send('Square authentication successful! Token received.');
+      res.redirect('/connect')
     } catch (error) {
       console.error('Square OAuth error:', error);
       res.send('Square OAuth error occurred.');
     }
+});
+
+// GET /api/users
+squareRouter.post('/transactions', async (req, res) => {
+  console.log('TRANSACTIONS ROUTE')
+
+  console.log('BODY', req.body)
+  const { jwtToken } = req.body
+
+  const decoded = jwt.verify(jwtToken, 'your-secret-key');
+  console.log('DECODED', decoded)
+
+  const company = await Company.findOne({ _id: decoded.id })
+  console.log('COMPANY', company)
+
+  try {
+    const payments = getSquarePayments({
+      company: company
+    })
+
+    console.log('ROUTE PAYMENTS', payments)
+
+    // Find the company document by ID
+    const existingCompany = await Company.findOne({ _id: company._id })
+
+    // Update the existingCompany.square field without overwriting existing information
+    existingCompany.square = { ...existingCompany.square, payments: convertBigIntToDecimal(payments) };
+
+    existingCompany.save()
+
+    console.log('UPDATED COMPANY', existingCompany)
+    // console.log('PAYMENTS', payments)
+
+    res.json({ transactions: existingCompany.square.payments })
+  } catch (e) {
+    console.log('ERROR: ', e)
+  }
+  res.send(200)
 });
 
 export default squareRouter

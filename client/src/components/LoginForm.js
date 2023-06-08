@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
+import { saveJWT } from '../utils/jwt';
 
 const SQUARE_CONNECTION_URL = (realmId) => `http://localhost:3000/api/square/auth?realmId=${realmId}`
 
@@ -21,13 +22,24 @@ const Button = styled.button`
 `;
 
 function LoginForm() {
+  const queryParams = new URLSearchParams(window.location.search);
+  const realmId = queryParams.get('realmId');
+  const jwt = queryParams.get('token');
+
   const handleConnectWithSquare = () => {
-    const queryParams = new URLSearchParams(window.location.search);
-    const realmId = queryParams.get('realmId');
-    
     // Open the Square connection link in a new tab
     window.open(SQUARE_CONNECTION_URL(realmId), '_blank');
   };
+
+
+  console.log('TOKEN', jwt)
+
+  useEffect(() => {
+    if (jwt) {
+      console.log('SAVING JWT')
+      saveJWT(jwt)
+    }
+  }, [])
 
   return (
     <Container>

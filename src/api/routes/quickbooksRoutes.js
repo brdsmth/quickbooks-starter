@@ -1,4 +1,5 @@
 import express from 'express'
+import jwt from 'jsonwebtoken'
 import User from '../../models/Company.model.js';
 import { getUserInfoFromQuickbooks } from '../../controllers/quickbooks.js';
 const quickbooksRouter = express.Router();
@@ -60,32 +61,40 @@ quickbooksRouter.get('/callback', async (req, res) => {
         // Store the QuickBooks access token and refresh token in your database or session for later use
         // TODO: Store in database
 
-        const info = await getUserInfoFromQuickbooks({
-            accessToken: accessToken,
-            realmId: realmId
-        })
+        // const info = await getUserInfoFromQuickbooks({
+        //     accessToken: accessToken,
+        //     realmId: realmId
+        // })
 
+        // console.log('INFO', info)
         // TODO: Check if company already exists, if so just update tokens
         const existingCompany = await Company.findOne({ 'quickbooks.realmId': realmId })
         console.log('EXISTING QUICKBOOKS COMPANY', existingCompany)
 
         if (!existingCompany) {
             const company = await Company.create({
-                quickbooks: info
+                quickbooks: token
             })
     
             await company.save()
         } else {
             // Update the existingCompany.square field without overwriting existing information
             // TODO: Remove the null values from info so that we aren't overwriting the refreshToken
-            existingCompany.quickbooks = { ...existingCompany.quickbooks, ...info };
+            existingCompany.quickbooks = { ...existingCompany.quickbooks, ...token };
             await existingCompany.save()
         }
 
 
+        // Generate JWT
+        const jsonToken = jwt.sign({ id: existingCompany.id }, 'your-secret-key');
+        console.log('JSON TOKEN', jsonToken)
+
+        // Send the JWT as the response
+        // res.json({ jsonToken });
+
         // res.send('QuickBooks authentication successful! Tokens received.');
         // alert('QuickBooks authentication successful! Tokens received.')
-        res.redirect(`/?realmId=${realmId}`)
+        res.redirect(`/?realmId=${realmId}&token=${jsonToken}`)
     } catch (error) {
         console.error('QuickBooks OAuth error:', error);
         res.send('QuickBooks OAuth error occurred.');
