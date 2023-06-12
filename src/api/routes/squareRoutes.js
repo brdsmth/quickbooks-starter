@@ -23,6 +23,16 @@ const squareConfig = {
 const { Client } = Square
 const squareClient = new Client(squareConfig)
 
+squareRouter.post('/webhooks', async (req, res) => {
+  console.log('WEBHOOK ENDPOINT')
+  console.log('REQ BODY', req.body)
+  console.log('REQ DATA', req.body.data)
+
+  // TODO: Automatically add to Quickbooks
+
+  res.sendStatus(200)
+});
+
 // GET /api/users
 squareRouter.get('/auth', async (req, res) => {
     const { realmId } = req.query

@@ -4,6 +4,7 @@ import LoginForm from '../components/LoginForm';
 import TransactionTable from '../components/TransactionTable';
 import Button from '../components/Button';
 import { getJWT } from '../utils/jwt';
+import TransactionsTableTwo from '../components/TransactionsTableTwo';
 
 export const Container = styled.div`
   display: flex;
@@ -32,12 +33,12 @@ const Transactions = () => {
 
     const [transactions, setTransactions] = useState(null)
 
-      const handleExportToQuickbooks = (e) => {
+      const handleSyncWithQuickbooks = (e) => {
         e.preventDefault();
         console.log('click')
     
         // Make API call to the server for login
-        fetch('/api/square/transactions', {
+        fetch('/api/quickbooks/sync', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -78,14 +79,16 @@ const Transactions = () => {
             console.error('Error:', error);
           });
       };
+
+    
     return (
         <Container>
             <AppName>SquareBooks</AppName>
             <ButtonContainer> 
                 <Button onClick={handleSyncWithSquare}>Sync with Square</Button>
-                <Button>Export to Quickbooks</Button>
+                <Button onClick={handleSyncWithQuickbooks}>Sync with Quickbooks</Button>
             </ButtonContainer>
-            <TransactionTable transactions={transactions} />
+            <TransactionsTableTwo transactions={transactions} />
         </Container>
     )
 }
