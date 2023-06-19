@@ -1,10 +1,9 @@
+// Local storage
 
-
-export const getJWT = (jwt) => {
-    return localStorage.getItem('squarebooks');
+export const getJWT = () => {
+    return localStorage.getItem('qb-starter');
 }
 
 export const saveJWT = (jwt) => {
-    localStorage.setItem('squarebooks', jwt);
-    console.log('STORAGE', getJWT())
+    localStorage.setItem('qb-starter', jwt);
 }

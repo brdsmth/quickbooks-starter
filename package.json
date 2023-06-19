@@ -1,5 +1,5 @@
 {
-  "name": "square-books",
+  "name": "quickbooks-starter",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -9,7 +9,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
-    "build": "cd ./client && yarn run build && cd .."
+    "build": "cd ./client && yarn run build && cd ..",
+    "clean": "rm -rf node_modules && cd ./client && rm -rf node_modules build && cd .."
   },
   "dependencies": {
     "dotenv": "^16.1.4",
@@ -18,7 +19,6 @@
     "intuit-oauth": "^4.0.0",
     "jsonwebtoken": "^9.0.0",
     "mongoose": "6.10.0",
-    "node-quickbooks": "^2.0.42",
-    "square": "^27.0.0"
+    "node-quickbooks": "^2.0.42"
   }
 }

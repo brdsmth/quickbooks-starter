@@ -1,6 +1,5 @@
 import React from 'react'
 import styled from 'styled-components'
-import LoginForm from '../components/LoginForm';
 
 export const Container = styled.div`
   display: flex;
@@ -19,8 +18,7 @@ const AppName = styled.div`
 const Auth = () => {
     return (
         <Container>
-            <AppName>SquareBooks</AppName>
-            <LoginForm />
+            <AppName>Quickbooks Starter</AppName>
         </Container>
     )
 }
