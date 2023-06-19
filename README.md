@@ -4,9 +4,19 @@
 
 This application is a starter for building on apps for the QuickBooks App store. This is an ongoing project for the QuickBooks Developer community.
 
-- Bradley
-
 ## Usage
+
+#### Environment
+
+```
+MONGO_URL=
+QUICKBOOKS_CLIENT_ID=
+QUICKBOOKS_CLIENT_SECRET=
+QUICKBOOKS_REDIRECT_URL=
+JWT_SECRET=
+```
+
+### Running Locally
 
 1. Install dependencies for server
 
